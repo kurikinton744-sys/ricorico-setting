@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#171923">
   <meta name="description" content="Excelの設定別確率を使ってリコリス・リコイルの設定1〜6をベイズ推測。スマホ・PC両対応。">
   <title>リコリコ 設定判別ツール</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="data.js" defer></script>
-  <script src="calculator.js" defer></script>
-  <script src="app.js" defer></script>
+  <link rel="stylesheet" href="style.css?v=20261117b">
+  <script src="data.js?v=20261117b" defer></script>
+  <script src="calculator.js?v=20261117b" defer></script>
+  <script src="app.js?v=20261117b" defer></script>
 </head>
 <body>
   <div class="page-shell">
@@ -31,7 +31,7 @@
       </section>
       <nav class="tabs" aria-label="機能切り替え"><button type="button" class="tab active" data-tab="input" aria-selected="true">実戦データ入力</button><button type="button" class="tab" data-tab="rates" aria-selected="false">設定別確率の確認・編集</button></nav>
       <div id="tab-input" class="tab-content">
-        <div class="section-heading"><div><h2>実戦データ</h2><p>数字を入力すると上の判別結果に即時反映します。</p></div><button class="btn btn-danger" id="clear-inputs" type="button">入力をすべて消去</button></div>
+        <div class="section-heading"><div><h2>実戦データ</h2><p>各項目の「＋」をタップすると1ずつ増えます。「−」で取り消しも可能です。数字の直接入力にも対応しています。</p></div><button class="btn btn-danger" id="clear-inputs" type="button">入力をすべて消去</button></div>
         <div id="input-groups" class="group-stack"></div>
       </div>
       <div id="tab-rates" class="tab-content" hidden>
@@ -39,7 +39,7 @@
         <div class="editor-intro">各値は <strong>%</strong> で入力します。カテゴリ別（当選時・AT終了画面・EP）の合計が設定ごとにほぼ100%になる必要があります。元ファイルの参照セルも併記しています。</div>
         <div id="rate-groups" class="group-stack"></div>
       </div>
-      <footer><p>出典：アップロードされた「リコリコ判別.xlsx」の設定別数値。独立・同一設定下での出現を仮定した計算上の推測であり、設定や勝利を保証するものではありません。データは端末のブラウザ内に保存され、サーバーへ送信しません。</p><p>非公式・個人利用向けツール。著作権者や遊技機メーカーとは関係ありません。</p></footer>
+      <footer><p>出典：アップロードされた「リコリコ判別 修正.xlsx」の設定別数値（直撃・設定5はユーザー指定により0.022へ訂正）。独立・同一設定下での出現を仮定した計算上の推測であり、設定や勝利を保証するものではありません。データは端末のブラウザ内に保存され、サーバーへ送信しません。</p><p>非公式・個人利用向けツール。著作権者や遊技機メーカーとは関係ありません。</p></footer>
     </main>
   </div>
 </body>

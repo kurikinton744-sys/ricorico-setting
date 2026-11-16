@@ -26,7 +26,12 @@
       }
       const rates = src.overrides?.[item.id];
       if (Array.isArray(rates) && rates.length === 6 && rates.every(x => typeof x === 'number' && Number.isFinite(x) && x >= 0 && x <= 1)) {
-        clean.overrides[item.id] = [...rates];
+        const restored = [...rates];
+        // 前バージョンで保存した誤入力22%を、今回確定した2.2%に移行する。
+        if (item.id === 'triggerDirect' && Math.abs(restored[4] - 0.22) < 1e-12) restored[4] = 0.022;
+        if (!restored.every((value, i) => Math.abs(value - item.rates[i]) < 1e-12)) {
+          clean.overrides[item.id] = restored;
+        }
       }
     }
     return clean;
@@ -58,16 +63,44 @@
   }
 
   function makeField(item, field, description) {
-    const label = el('label','field');
-    const text = el('span','',description);
+    const fieldWrap = el('div','field');
+    fieldWrap.append(el('span','field-caption',description));
+    const control = el('div','counter');
     const input = document.createElement('input');
     input.type='number'; input.min='0'; input.step='1'; input.inputMode='numeric';
     input.dataset.item=item.id; input.dataset.field=field;
     input.setAttribute('aria-label', `${item.label} ${description}`);
     input.value = state.inputs[item.id][field] || '';
     input.placeholder = '0';
-    label.append(text, input);
-    return label;
+    const makeCounterButton = (delta, symbol, action) => {
+      const button=el('button', `counter-button ${delta>0?'counter-plus':'counter-minus'}`, symbol);
+      button.type='button';
+      button.dataset.item=item.id;
+      button.dataset.field=field;
+      button.dataset.delta=String(delta);
+      button.setAttribute('aria-label',`${item.label} ${description}を1${action}`);
+      if (delta<0) button.disabled=!(state.inputs[item.id][field]>0);
+      return button;
+    };
+    control.append(makeCounterButton(-1,'−','減らす'),input,makeCounterButton(1,'＋','増やす'));
+    fieldWrap.append(control);
+    return fieldWrap;
+  }
+
+  function syncItemControls(itemId, rewriteValues=false) {
+    const values=state.inputs[itemId];
+    const invalidPair=values.n!==undefined && values.k>values.n;
+    for(const node of $('input-groups').querySelectorAll('[data-item]')) {
+      if(node.dataset.item!==itemId) continue;
+      const field=node.dataset.field;
+      const value=values[field];
+      if(node.matches('input')) {
+        if(rewriteValues) node.value=String(value);
+        node.setAttribute('aria-invalid',String(!Number.isSafeInteger(value)||value<0 || (invalidPair && field==='k')));
+      } else if (node.matches('button[data-delta]')) {
+        node.disabled = !Number.isSafeInteger(value) || (Number(node.dataset.delta)<0 ? value<=0 : value>=Number.MAX_SAFE_INTEGER);
+      }
+    }
   }
 
   function renderInputs() {
@@ -125,14 +158,6 @@
     for(const issue of result.issues) {
       if(seen.has(issue.message)) continue;seen.add(issue.message);
       const alert=el('div','alert');alert.append(el('strong','', '要確認：'),document.createTextNode(issue.message));
-      if(issue.group==='trigger' && !state.overrides.triggerDirect && data.items.find(it=>it.id==='triggerDirect').rates[4]===0.22) {
-        const button=el('button','alert-button','設定5の「直撃 22%」を「2.2%」へ変更する');
-        button.type='button';button.addEventListener('click',()=>{
-          const item=data.items.find(it=>it.id==='triggerDirect');
-          state.overrides[item.id]=[...item.rates];state.overrides[item.id][4]=0.022;
-          persist();renderRates();refresh();
-        });alert.append(button);
-      }
       target.append(alert);
       if(seen.size>=6) break;
     }
@@ -172,10 +197,22 @@
     const target=event.target;if(!target.matches('input[data-item]'))return;
     const item=target.dataset.item,field=target.dataset.field;
     state.inputs[item][field]=importNumber(target);
-    const data=state.inputs[item];
-    const bad=!Number.isSafeInteger(data[field])||data[field]<0 || (data.n!==undefined&&data.k>data.n);
-    target.setAttribute('aria-invalid',String(bad));
-    if(!Number.isFinite(data[field])) {refresh();return;}
+    syncItemControls(item);
+    if(Number.isFinite(state.inputs[item][field])) persist();
+    refresh();
+  });
+
+  // ＋/−はキーボード不要のカウンター。タップごとに1増減して即時計算・保存。
+  $('input-groups').addEventListener('click',event=>{
+    const button=event.target.closest('button[data-delta]');
+    if(!button || !$('input-groups').contains(button) || button.disabled)return;
+    const item=button.dataset.item,field=button.dataset.field,delta=Number(button.dataset.delta);
+    const current=state.inputs[item][field];
+    if(!Number.isSafeInteger(current) || current<0)return;
+    const next=current+delta;
+    if(next<0 || !Number.isSafeInteger(next))return;
+    state.inputs[item][field]=next;
+    syncItemControls(item,true);
     persist();refresh();
   });
 

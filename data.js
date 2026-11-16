@@ -1,8 +1,8 @@
-/* Excel原本の設定別確率（変更なし）。自動抽出データ。 */
+/* 添付Excelの設定別確率。ユーザー指定により「直撃・設定5」は0.22から0.022へ訂正済み。 */
 window.RIKORIKO_DATA = {
-  "version": "2026-11-16",
+  "version": "2026-11-17",
   "title": "L リコリス・リコイル",
-  "sourceFile": "リコリコ判別.xlsx",
+  "sourceFile": "リコリコ判別 修正.xlsx",
   "sourceSheet": "設定1",
   "items": [
     {
@@ -225,7 +225,7 @@ window.RIKORIKO_DATA = {
         0.01,
         0.012,
         0.017,
-        0.22,
+        0.022,
         0.026
       ],
       "source": "設定1!C104:C109"
