@@ -1,25 +1,10 @@
-/* 添付Excelの設定別確率。ユーザー指定により「直撃・設定5」は0.22から0.022へ訂正済み。 */
+/* 添付Excelの設定別確率。直撃・設定5はユーザー指定により2.2%へ訂正。駆け抜け0Gと上位250Gは判別対象外。 */
 window.RIKORIKO_DATA = {
-  "version": "2026-11-17",
+  "version": "2026-11-17-zone-cleanup",
   "title": "L リコリス・リコイル",
   "sourceFile": "リコリコ判別 修正.xlsx",
   "sourceSheet": "設定1",
   "items": [
-    {
-      "id": "run0",
-      "label": "駆け抜け 0G",
-      "group": "zone-run",
-      "kind": "binomial",
-      "rates": [
-        1.0,
-        1.0,
-        1.0,
-        1.0,
-        1.0,
-        1.0
-      ],
-      "source": "設定1!C3:C8"
-    },
     {
       "id": "run100",
       "label": "駆け抜け 100G",
@@ -154,21 +139,6 @@ window.RIKORIKO_DATA = {
         0.42
       ],
       "source": "設定1!C68:C73"
-    },
-    {
-      "id": "high250",
-      "label": "上位 250G",
-      "group": "zone-high",
-      "kind": "binomial",
-      "rates": [
-        1.0,
-        1.0,
-        1.0,
-        1.0,
-        1.0,
-        1.0
-      ],
-      "source": "設定1!C75:C80"
     },
     {
       "id": "high400",
